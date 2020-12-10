@@ -153,6 +153,7 @@ void getDataFromPC() {
             readInProgress = true;
         }
     }
+    /*
     else {
         //als er niets doorgeven wordt moet er niets worden bewogen 
         //er wordt niets bewogen als alle hoeken nul zijn en het toerental ook nul is
@@ -161,7 +162,7 @@ void getDataFromPC() {
         toerental_tilt_org = 0;
         toerental_rotate_org = 0;
     }
-
+    */
 }
 // tilt_hoek,rotate_hoek en toerental worden uit de gegeven string gehaald
 void parseData() {
@@ -170,7 +171,8 @@ void parseData() {
 
     char* strtokIndx; // this is used by strtok() as an index
 
-   //tilt,rotate,rpm_tilt,rpm_rotate
+   //<tilt,rotate,rpm_tilt,rpm_rotate>
+   //<XX,XX,XXX,XXX>
 
     strtokIndx = strtok(inputBuffer, ","); // this continues where the previous call left off
     tilt_hoek   = atoi(strtokIndx);     // convert this part to an integer
@@ -229,6 +231,8 @@ void loop() {
     schakelaarstaat2 = digitalRead(schakelaar_2);
     schakelaarstaat3 = digitalRead(schakelaar_3);
     schakelaarstaat4 = digitalRead(schakelaar_4);
+  
+
    
   
     if (schakelaarstaat1 == HIGH && schakelaarstaat2 == HIGH) {
@@ -264,7 +268,7 @@ void loop() {
         */
         
         //doorgeven rotate & tilt-hoek en toerental aan Rasberry-Pi
-        replyToPC();
+        //replyToPC();
 
         //aansturing stepper tilt
         motortilt.move(tilt_steps);
@@ -289,7 +293,7 @@ void loop() {
         motortilt.setMicrostep(1);
 
         //doorsturen tilt_hoek,rotate_heok en toerental aan Rasberry-Pi
-        replyToPC();
+        //replyToPC();
         
         //aansturen stappen motor tilt 
         motortilt.move(tilt_hoek);
@@ -304,7 +308,9 @@ void loop() {
     schakelaarstaat4 = digitalRead(schakelaar_4);
 
 
+
     if (schakelaarstaat3 == HIGH && schakelaarstaat4 == HIGH) {
+       
         //rotate
 
         //setup rotate stepper
@@ -332,7 +338,7 @@ void loop() {
         */
 
         //doorgeven rotate & tilt-hoek en toerental aan Rasberry-Pi
-        replyToPC();
+        //replyToPC();
 
         //aansturing stepper rotate
         //gegeven string doorsturen
@@ -342,7 +348,7 @@ void loop() {
     //doorsturen ERROR:WRONG ROTATE VALUE boodschap op de seriële monitor
     //motoren niets laten doen 
     //lege string doorsturen , zelfde format 00,00,0000
-    else if (schakelaarstaat3!=HIGH || schakelaarstaat4!=HIGH) {
+   else if (schakelaarstaat3!=HIGH || schakelaarstaat4!=HIGH) {
         //doorgeven rotate & tilt-hoek en toerental aan Rasberry-Pi
         //we sturen nullen door omdat er niks zal gebeuren 
         tilt_hoek = 0;
@@ -355,7 +361,7 @@ void loop() {
         motorrotate.setMicrostep(1);
 
         //doorsturen tilt_hoek,rotate_heok en toerental aan Rasberry-Pi
-        replyToPC();
+        //replyToPC();
 
         //aansturen stappen motor tilt 
         motorrotate.move(tilt_hoek);
@@ -364,8 +370,8 @@ void loop() {
     
    
     
-    
-    
+    //doorgeven tilt_hoek,rotate_hoek,tilt_toerental_org,rotate_hoek_org naar RPI
+    replyToPC();
     
     
     
