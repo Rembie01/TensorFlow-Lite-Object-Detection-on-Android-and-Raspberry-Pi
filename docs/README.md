@@ -31,4 +31,4 @@ bash start_webcam_serial.sh
 
 ## Description
 The project currently allows one object (the one with the highest score) from one class to be detected. This makes it a lot easier to follow only one object.
-The script returns a string and sends this over the usb port. This can can be read by the Arduino. (scripts are currently lacking)
+The script returns a string and sends this over the usb port. This can can be read by the Arduino. (scripts are currently available under expermental(yes, this is a typo))
