@@ -64,11 +64,43 @@ const byte microsteps_tilt = 16;
 const byte microsteps_rotate = 16;
 const int frequentie_controller = 30000;
 const int toerental_max = (step_angle / 360) * frequentie_controller * 60;
-//int toerental;
+//instellen toerental
 int toerental_tilt;
-int toerental_tilt_org;
 int toerental_rotate;
+int toerental_tilt_org;
 int toerental_rotate_org;
+
+
+
+
+
+
+
+
+
+//parameters overbrenging tilt
+const byte z_1_tilt = 12;
+const byte z_2_tilt = 60;
+const byte een_op_overbrengingsverhouding_tilt = z_2_tilt / z_1_tilt;
+
+
+//parameters overbrenging rotate
+const byte z_1_rotate = 12;
+const byte z_2_rotate = 60;
+const byte een_op_overbrengingsverhouding_rotate = z_2_rotate / z_1_rotate;
+
+
+//variabelen om status van schakelaars weer te geven
+bool schakelaarstaat1;
+bool schakelaarstaat2;
+bool schakelaarstaat3;
+bool schakelaarstaat4;
+
+
+
+
+
+
 
 //Setup steppers
 DRV8825 motortilt(steps_motor, pin_dir_tilt,pin_step_tilt,pin_sleep_tilt,pin_mode0_tilt,pin_mode1_tilt,pin_mode2_tilt);
@@ -79,23 +111,6 @@ DRV8825 motorrotate(steps_motor,pin_dir_rotate,pin_step_rotate,pin_sleep_rotate,
 //variabelen voor hoeken tilt en rotate
 
 
-//parameters overbrenging tilt
-const byte z_1_tilt=12;
-const byte z_2_tilt=60;
-const byte een_op_overbrengingsverhouding_tilt=z_2_tilt/z_1_tilt;
-
-
-//parameters overbrenging rotate
-const byte z_1_rotate=12;
-const byte z_2_rotate=60;
-const byte een_op_overbrengingsverhouding_rotate=z_2_rotate/z_1_rotate;
-
-
-//variabelen om status van schakelaars weer te geven
-bool schakelaarstaat1;
-bool schakelaarstaat2;
-bool schakelaarstaat3;
-bool schakelaarstaat4;
 
 
 void setup() {
@@ -105,6 +120,7 @@ void setup() {
 //aanzetten steppers
 motortilt.enable();
 motorrotate.enable();
+
 
 	//setup Seriële monitor
 	Serial.begin(115200);
@@ -123,7 +139,7 @@ motorrotate.enable();
 //inlezen seriële poort 
 void getDataFromPC() {
 
-    // receive data from PC and save it into inputBuffer
+    // receive data from RPI and save it into inputBuffer
 
     if (Serial.available() > 0) {
 
@@ -153,16 +169,7 @@ void getDataFromPC() {
             readInProgress = true;
         }
     }
-    /*
-    else {
-        //als er niets doorgeven wordt moet er niets worden bewogen 
-        //er wordt niets bewogen als alle hoeken nul zijn en het toerental ook nul is
-        tilt_hoek = 0;
-        rotate_hoek = 0;
-        toerental_tilt_org = 0;
-        toerental_rotate_org = 0;
-    }
-    */
+ 
 }
 // tilt_hoek,rotate_hoek en toerental worden uit de gegeven string gehaald
 void parseData() {
@@ -185,8 +192,6 @@ void parseData() {
 
     strtokIndx = strtok(NULL, ",");
     toerental_rotate_org = atoi(strtokIndx);     // convert this part to a integer
-
-
 
 }
 // functie om gegevens te versturen naar de Rasberry-pi
@@ -216,8 +221,7 @@ void loop() {
 
 
 
-    //we lezen hier de gewenste hoek en toerental binnen van de Rasberry-pi binnen
-    //inlezen seriële poort
+    //we lezen hier de gewenste hoek en toerental binnen van de Raspberry-pi binnen
     getDataFromPC();
 
     //Serial.println("een_op_overbrengingsverhouding_tilt=");
@@ -266,9 +270,7 @@ void loop() {
             delay(1000);
         }
         */
-        
-        //doorgeven rotate & tilt-hoek en toerental aan Rasberry-Pi
-        //replyToPC();
+
 
         //aansturing stepper tilt
         motortilt.move(tilt_steps);
@@ -287,7 +289,7 @@ void loop() {
         rotate_hoek = 0;
         toerental_tilt_org = 0;
         toerental_rotate_org = 0;
-        //toerental = 0;
+
         //setup stappen motor 
         motortilt.setRPM(toerental_tilt_org);
         motortilt.setMicrostep(1);
@@ -337,8 +339,7 @@ void loop() {
         }
         */
 
-        //doorgeven rotate & tilt-hoek en toerental aan Rasberry-Pi
-        //replyToPC();
+        
 
         //aansturing stepper rotate
         //gegeven string doorsturen
