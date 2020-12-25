@@ -15,20 +15,24 @@ class ArduinoCom:
         self.ser.write(string.encode('utf-8'))
 
     def receive_from_arduino(self):
-        ck = ""
-        x = "z"
+        """
+        Reads input until '<' is found, adds every character until '>' is found.
+        Returns the string of characters
+        """
+        received = ""
+        current_char = self.ser.read()
         bytecount = -1
 
-        while ord(x) != self._startmarker:
-            x = self.ser.read()
+        while ord(current_char) != self._startmarker:
+            current_char = self.ser.read()
 
-        while ord(x) != self._endmarker:
-            if ord(x) != self._startmarker:
-                ck = ck + x.decode("utf-8")
+        while ord(current_char) != self._endmarker:
+            if ord(current_char) != self._startmarker:
+                received = received + current_char.decode("utf-8")
                 bytecount += 1
-            x = self.ser.read()
+            current_char = self.ser.read()
 
-        return ck
+        return received
 
     def wait_for_arduino(self):
         msg = ""
