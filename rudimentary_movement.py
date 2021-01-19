@@ -1,3 +1,7 @@
+# Author: Rembie01
+# Date: 8 dec 2020
+
+
 class Movement:
     """Allows the stepper motor to move"""
 
@@ -7,38 +11,43 @@ class Movement:
         self.v_angle = fov_angle_vertical
         self.res = resolution
         self.play = play
-        self.direction = '-'
 
     def move_horizontal(self, xcoord):
-        self.direction = '-'
-        rotate_pixels = -(xcoord - self.res[0]/2)
+        rotate_pixels = -(xcoord - self.res[0] / 2)
         pixels_per_degree = self.res[0] / self.h_angle
         rotate = round(rotate_pixels / pixels_per_degree)
-        if rotate < 0:
-            self.direction = '+'
-            rotate = -rotate
-        if rotate <= self.play:
-            return None
-        if len(str(rotate)) <= 1:
-            rotate = '0' + str(rotate)
-        rpm = self.factor * rotate
-        while len(str(rpm)) <= 3:
-            rpm = '0' + str(rpm)
-        return 't:00r:' + str(rotate) + 's:' + str(rpm) + 'td:0rd:' + self.direction
+        if abs(rotate) <= self.play:
+            return '<00,00,0000>'
+        rpm = abs(round(self.factor * rotate))
+        return '<00,' + str(rotate) + ',' + str(rpm) + '>'
 
     def move_vertical(self, ycoord):
-        self.direction = '-'
         tilt_pixels = -(ycoord - self.res[1] / 2)
         pixels_per_degree = self.res[1] / self.v_angle
         tilt = round(tilt_pixels / pixels_per_degree)
-        if tilt < 0:
-            self.direction = '+'
-            tilt = -tilt
-        if tilt <= self.play:
-            return None
-        if len(str(tilt)) <= 1:
-            tilt = '0' + str(tilt)
-        rpm = self.factor * tilt
-        while len(str(rpm)) <= 3:
-            rpm = '0' + str(rpm)
-        return 't:' + str(tilt) + 'r:00s:' + str(rpm) + 'td:' + self.direction + 'rd:0'
+        if abs(tilt) <= self.play:
+            return '<00,00,0000>'
+        rpm = abs(round(self.factor * tilt))
+        return '<' + str(tilt) + ',00,' + str(rpm) + '>'
+
+    def move(self, xcoord, ycoord):
+        rotate_pixels = -(xcoord - self.res[0] / 2)
+        tilt_pixels = -(ycoord - self.res[1] / 2)
+        rotate_pixels_per_degree = self.res[0] / self.h_angle
+        tilt_pixels_per_degree = self.res[1] / self.v_angle
+        rotate = round(rotate_pixels / rotate_pixels_per_degree)
+        tilt = round(tilt_pixels / tilt_pixels_per_degree)
+        if abs(rotate) <= self.play and abs(tilt) <= self.play:
+            return '<0,0,0,0>'
+        if abs(rotate) <= self.play:
+            tilt_rpm = abs(round(self.factor * tilt))
+            return '<' + str(tilt) + ',0,' + str(tilt_rpm) + ',0>'
+        if abs(tilt) <= self.play:
+            rotate_rpm = abs(round(self.factor * rotate))
+            return '<0,' + str(rotate) + ',0,' + str(rotate_rpm) + '>'
+        rotate_rpm = abs(round(self.factor * rotate))
+        tilt_rpm = abs(round(self.factor * tilt))
+        return '<' + str(tilt) + ',' + str(rotate) + ',' + str(tilt_rpm) + ',' + str(rotate_rpm) + '>'
+
+
+
